@@ -5,6 +5,15 @@ use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+// Простой тестовый роут для проверки работы API
+Route::get('/test', function () {
+    return response()->json([
+        'message' => 'API работает!',
+        'timestamp' => now(),
+        'environment' => app()->environment()
+    ]);
+});
+
 
 
 
