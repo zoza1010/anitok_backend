@@ -17,7 +17,7 @@ class AuthController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8|confirmed', // нужно передавать password_confirmation
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
         $user = User::create([
@@ -26,8 +26,17 @@ class AuthController extends Controller
             'password' => Hash::make($data['password']),
         ]);
 
-        return response()->json(['message' => 'Пользователь успешно зарегистрирован']);
+        // Создаем токен для аутентификации SPA
+        $token = $user->createToken('api-token')->plainTextToken;
+
+        return response()->json([
+            'ok' => true,
+            'status' => 'Регистрация успешна',
+            'user' => $user,
+            'token' => $token,
+        ]);
     }
+
 
     // Вход (логин)
     public function login(Request $request)
@@ -37,15 +46,14 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        if (!Auth::attempt($credentials)) {
-            throw ValidationException::withMessages([
-                'email' => ['Неверные данные для входа.'],
-            ]);
+        $user = User::where('email', $credentials['email'])->first();
+
+        if (! $user || ! Hash::check($credentials['password'], $user->password)) {
+            return response()->json([
+                'message' => 'Неверный email или пароль',
+            ], 401);
         }
 
-        $user = Auth::user();
-
-        // Создаём токен для API доступа
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
@@ -54,6 +62,7 @@ class AuthController extends Controller
             'user' => $user,
         ]);
     }
+
 
     // Выход (логаут)
     public function logout(Request $request)
