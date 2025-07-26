@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
 
             $table->string('title');
-            $table->string('title_eng')->nullable();
             $table->text('description')->nullable();
 
             $table->string('poster_url')->nullable();

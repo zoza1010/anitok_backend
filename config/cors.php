@@ -6,9 +6,9 @@ return [
 
     'allowed_methods' => ['*'],
 
-    // Удалите или закомментируйте 'allowed_origins' => ['*'],
-    // 'allowed_origins' => ['*'],
-
+    // Временно разрешаем все домены для тестирования
+    'allowed_origins' => ['*'],
+    
     // Используйте 'allowed_origins_patterns' для разрешения конкретных доменов
     'allowed_origins_patterns' => [
         'http://localhost:8000',        // Ваш бэкенд локально

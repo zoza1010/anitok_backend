@@ -32,6 +32,14 @@ class ParseAnime extends Command
     protected $description = 'Парсим топ аниме с Shikimori API и сохраняем в БД';
 
     /**
+     * Очищает описание от любых тегов в квадратных скобках (например, [i], [character=...], [[текст]], и т.п.)
+     */
+    private function cleanDescription($desc) {
+        // Удалить все теги в квадратных скобках, включая вложенные и двойные
+        return preg_replace('/\[.*?\]/u', '', $desc);
+    }
+
+    /**
      * Execute the console command.
      */
     public function handle()
@@ -39,18 +47,17 @@ class ParseAnime extends Command
         $count = (int) $this->argument('count');
 
         $client = new Client([
-            'base_uri' => 'https://shikimori.one/api/v2/',
             'headers' => [
-                'User-Agent' => 'YourAppNameHere', // ОБЯЗАТЕЛЬНО заменить на имя вашего OAuth2 приложения
+                'User-Agent' => 'AniTokParser/1.0',
                 'Accept' => 'application/json',
             ],
-            'http_errors' => false, // Чтобы не выбрасывало исключения сразу
+            'http_errors' => false,
         ]);
 
         $this->info("Начинаем парсинг топ {$count} аниме...");
 
-        // Получаем топ аниме с учетом лимита
-        $response = $client->get('animes', [
+        // Получаем топ аниме (старый API)
+        $response = $client->get('https://shikimori.one/api/animes', [
             'query' => [
                 'order' => 'ranked',
                 'limit' => $count,
@@ -72,7 +79,7 @@ class ParseAnime extends Command
             $attempts = 0;
             do {
                 $attempts++;
-                $animeResponse = $client->get("animes/{$animeId}");
+                $animeResponse = $client->get("https://shikimori.one/api/animes/{$animeId}");
                 $status = $animeResponse->getStatusCode();
 
                 if ($status === 429) {
@@ -167,9 +174,8 @@ class ParseAnime extends Command
             $animeModel = Anime::updateOrCreate([
                 'id' => $animeData['id'],
             ], [
-                'title' => $animeData['name'] ?? null,
-                'title_eng' => $animeData['name_eng'] ?? null,
-                'description' => $animeData['description'] ?? null,
+                'title' => $animeData['russian'] ?? $animeData['name'] ?? null,
+                'description' => isset($animeData['description']) ? $this->cleanDescription($animeData['description']) : null,
                 'poster_url' => $animeData['image']['original'] ?? null,
                 'aired_on' => $animeData['aired_on'] ?? null,
                 'released_on' => $animeData['released_on'] ?? null,
