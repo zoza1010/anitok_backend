@@ -1,61 +1,149 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# AniTok Backend API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Laravel 12 API backend для проекта AniTok с аутентификацией через Sanctum.
 
-## About Laravel
+## 🚀 Технологии
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Laravel 12** - PHP фреймворк
+- **Laravel Sanctum** - API аутентификация
+- **PostgreSQL** - база данных
+- **Docker** - контейнеризация
+- **Render** - хостинг
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 📋 API Endpoints
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Аутентификация
+- `POST /auth/register` - регистрация
+- `POST /auth/login` - вход
+- `POST /auth/logout` - выход (требует авторизации)
+- `GET /auth/protected-test` - тест защищенного роута
 
-## Learning Laravel
+### Пользователи
+- `GET /user` - получить данные текущего пользователя
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 🛠 Локальная разработка
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```bash
+# Установка зависимостей
+composer install
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+# Копирование .env
+cp .env.example .env
 
-## Laravel Sponsors
+# Генерация ключа приложения
+php artisan key:generate
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# Настройка базы данных в .env
+# DB_CONNECTION=pgsql
+# DB_HOST=localhost
+# DB_PORT=5432
+# DB_DATABASE=anitok
+# DB_USERNAME=postgres
+# DB_PASSWORD=password
 
-### Premium Partners
+# Миграции
+php artisan migrate
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+# Запуск сервера
+php artisan serve
+```
 
-## Contributing
+## 🚀 Деплой на Render
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 1. Подготовка репозитория
 
-## Code of Conduct
+```bash
+# Инициализация git (если еще не сделано)
+git init
+git add .
+git commit -m "Initial commit"
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# Создание репозитория на GitHub
+# Затем:
+git remote add origin https://github.com/your-username/anitok-backend.git
+git push -u origin main
+```
 
-## Security Vulnerabilities
+### 2. Настройка на Render
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1. Зайди на [render.com](https://render.com)
+2. Создай новый **Web Service**
+3. Подключи GitHub репозиторий
+4. Настрой переменные окружения:
 
-## License
+```env
+APP_ENV=production
+APP_KEY=base64:your-generated-key
+DB_CONNECTION=pgsql
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 3. Создание базы данных
+
+1. В Render создай **PostgreSQL** базу данных
+2. Назови её `anitok-db`
+3. Render автоматически подключит её к сервису
+
+### 4. Переменные окружения
+
+Render автоматически настроит переменные базы данных из `render.yaml`:
+
+- `DB_HOST` - из базы данных
+- `DB_PORT` - из базы данных  
+- `DB_DATABASE` - из базы данных
+- `DB_USERNAME` - из базы данных
+- `DB_PASSWORD` - из базы данных
+
+### 5. Деплой
+
+После настройки Render автоматически:
+- Соберет Docker образ
+- Запустит миграции
+- Развернет приложение
+
+## 🔧 Исправление проблем
+
+### Проблема с авторизацией
+
+Если получаешь ошибку `Route [login] not defined` при невалидном токене, добавь в `app/Exceptions/Handler.php`:
+
+```php
+use Illuminate\Auth\AuthenticationException;
+
+protected function unauthenticated($request, AuthenticationException $exception)
+{
+    if ($request->expectsJson()) {
+        return response()->json([
+            'message' => 'Ви не авторизовані.',
+        ], 401);
+    }
+
+    return redirect()->guest(route('login'));
+}
+```
+
+## 📝 Структура проекта
+
+```
+anitok-backend/
+├── app/
+│   ├── Http/Controllers/Auth/
+│   │   └── AuthController.php
+│   └── Models/
+├── config/
+├── database/
+├── routes/
+│   └── api.php
+├── Dockerfile
+├── render.yaml
+└── composer.json
+```
+
+## 🔗 Полезные ссылки
+
+- [Laravel Documentation](https://laravel.com/docs)
+- [Laravel Sanctum](https://laravel.com/docs/sanctum)
+- [Render Documentation](https://render.com/docs)
+
+## 📄 Лицензия
+
+MIT License
