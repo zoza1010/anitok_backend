@@ -104,37 +104,14 @@ class ParseAnime extends Command
 
                 $animeData = json_decode($animeResponse->getBody(), true);
 
-                // --- Age Rating ---
-                if (!empty($animeData['rating'])) {
-                    $ratingMap = [
-                        'g' => '0+',
-                        'pg' => '6+',
-                        'pg_13' => '13+',
-                        'r' => '17+',
-                        'r_plus' => '18+',
-                        'rx' => '18+ (эротика)',
-                    ];
-                    $nameEng = $animeData['rating'];
-                    $name = $ratingMap[$nameEng] ?? $nameEng;
-
-                    $ageRating = AnimeAgeRating::firstOrCreate([
-                        'name_eng' => $nameEng,
-                    ], [
-                        'name' => $name,
-                    ]);
-                } else {
-                    $ageRating = null;
-                }
-
                 // --- Genres ---
                 $genres = [];
                 if (!empty($animeData['genres'])) {
                     foreach ($animeData['genres'] as $genre) {
-                        $g = Genre::firstOrCreate([
-                            'id' => $genre['id'],
+                        $g = Genre::updateOrCreate([
+                            'name_eng' => $genre['name'],
                         ], [
                             'name' => $genre['russian'] ?? $genre['name'],
-                            'name_eng' => $genre['name'],
                         ]);
                         $genres[] = $g->id;
                     }
@@ -150,7 +127,7 @@ class ParseAnime extends Command
                     $nameEng = $animeData['status'];
                     $name = $statusMap[$nameEng] ?? $nameEng;
 
-                    $status = AnimeStatus::firstOrCreate([
+                    $status = AnimeStatus::updateOrCreate([
                         'name_eng' => $nameEng,
                     ], [
                         'name' => $name,
@@ -172,13 +149,35 @@ class ParseAnime extends Command
                     $nameEng = $animeData['kind'];
                     $name = $typeMap[$nameEng] ?? $nameEng;
 
-                    $type = AnimeType::firstOrCreate([
+                    $type = AnimeType::updateOrCreate([
                         'name_eng' => $nameEng,
                     ], [
                         'name' => $name,
                     ]);
                 } else {
                     $type = null;
+                }
+
+                // --- Age Rating ---
+                if (!empty($animeData['rating'])) {
+                    $ratingMap = [
+                        'g' => '0+',
+                        'pg' => '6+',
+                        'pg_13' => '13+',
+                        'r' => '17+',
+                        'r_plus' => '18+',
+                        'rx' => '18+ (эротика)',
+                    ];
+                    $nameEng = $animeData['rating'];
+                    $name = $ratingMap[$nameEng] ?? $nameEng;
+
+                    $ageRating = AnimeAgeRating::updateOrCreate([
+                        'name_eng' => $nameEng,
+                    ], [
+                        'name' => $name,
+                    ]);
+                } else {
+                    $ageRating = null;
                 }
 
                 // --- Сохраняем само аниме ---
