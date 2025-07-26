@@ -14,6 +14,15 @@ Route::get('/test', function () {
     ]);
 });
 
+// Временный роут для просмотра пользователей (только для разработки)
+Route::get('/users', function () {
+    $users = \App\Models\User::select('id', 'name', 'email', 'created_at')->get();
+    return response()->json([
+        'total' => $users->count(),
+        'users' => $users
+    ]);
+});
+
 
 
 
